@@ -1,0 +1,28 @@
+Submodule linux contains untracked content
+Submodule musl contains modified content
+diff --git a/musl/src/internal/pthread_impl.h b/musl/src/internal/pthread_impl.h
+index d9db63a8..f7fd6a6d 100644
+--- a/musl/src/internal/pthread_impl.h
++++ b/musl/src/internal/pthread_impl.h
+@@ -23,7 +23,7 @@ struct pthread {
+ 	uintptr_t canary, canary2;
+ 
+ 	/* Part 2 -- implementation details, non-ABI. */
+-	int tid;
++	uintptr_t tid;
+ 	int errno_val;
+ 	volatile int detach_state;
+ 	volatile int cancel;
+diff --git a/rumpkernel/linux.c b/rumpkernel/linux.c
+index 8addc555eb07..0085f0f3f6f7 100644
+--- a/rumpkernel/linux.c
++++ b/rumpkernel/linux.c
+@@ -12,7 +12,7 @@ void *rumprun_thread_create_withtls(int (*func)(void *), void *arg,
+ 
+ 	return create_thread("__clone", NULL,
+ 			     (void (*)(void *))func, arg,
+-			     stack, stack_size, jointable);
++			     NULL, 0, jointable);
+ }
+ 
+ void rumprun_thread_exit_withtls(void)
