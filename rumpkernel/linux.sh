@@ -123,6 +123,11 @@ rumpkernel_build_test()
 	fi
 }
 
+C_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang
+CXX_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+TARGET_TRIPLE=x86_64-rumprun-linux
+LLVM_PATH=${PWD}/llvm
+
 rumpkernel_install_libcxx()
 {
 # build libunwind for Linux
@@ -137,18 +142,18 @@ rumpkernel_install_libcxx()
         LIBUNWIND_FLAGS="-I${OUTDIR}/include -D_LIBUNWIND_IS_BAREMETAL=1"
         cmake \
           -DCMAKE_CROSSCOMPILING=True \
-          -DCMAKE_C_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang \
+          -DCMAKE_C_COMPILER=${C_COMPILER} \
           -DCMAKE_C_FLAGS="${LIBUNWIND_FLAGS}" \
-          -DCMAKE_CXX_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang++ \
+          -DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
           -DCMAKE_CXX_FLAGS="${LIBUNWIND_FLAGS}" \
           -DCMAKE_INSTALL_PREFIX="${OUTDIR}" \
           -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
           -DLIBUNWIND_ENABLE_SHARED=0 \
           -DLIBUNWIND_ENABLE_STATIC=1 \
           -DLIBUNWIND_ENABLE_CROSS_UNWINDING=1 \
-          -DLIBUNWIND_TARGET_TRIPLE=x86_64-rumprun-linux \
-          -DLLVM_PATH=../../llvm \
-          ../../llvm/libunwind
+          -DLIBUNWIND_TARGET_TRIPLE=${TARGET_TRIPLE} \
+          -DLLVM_PATH=${LLVM_PATH} \
+          ${LLVM_PATH}/libunwind
         ${MAKE} VERBOSE=1
         ${MAKE} install
 )
@@ -162,22 +167,22 @@ rumpkernel_install_libcxx()
         LIBCXXABI_FLAGS="-I${OUTDIR}/include"
         cmake \
           -DCMAKE_CROSSCOMPILING=True \
-          -DCMAKE_C_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang \
+          -DCMAKE_C_COMPILER=${C_COMPILER} \
           -DCMAKE_C_FLAGS="${LIBCXXABI_FLAGS}" \
-          -DCMAKE_CXX_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang++ \
+          -DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
           -DCMAKE_CXX_FLAGS="${LIBCXXABI_FLAGS}" \
           -DCMAKE_INSTALL_PREFIX="${OUTDIR}" \
           -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
           -DCMAKE_SHARED_LINKER_FLAGS="-L${OUTDIR}/lib" \
           -DLIBCXXABI_USE_LLVM_UNWINDER=1 \
-          -DLIBCXXABI_LIBUNWIND_PATH=../../llvm/unwind \
-          -DLIBCXXABI_LIBCXX_INCLUDES=../../llvm/libcxx/include \
+          -DLIBCXXABI_LIBUNWIND_PATH=${LLVM_PATH}/unwind \
+          -DLIBCXXABI_LIBCXX_INCLUDES=${LLVM_PATH}/libcxx/include \
           -DLIBCXXABI_ENABLE_SHARED=0 \
           -DLIBCXXABI_ENABLE_STATIC=1 \
           -DLIBCXXABI_BAREMETAL=1 \
-          -DLIBCXXABI_TARGET_TRIPLE=x86_64-rumprun-linux \
-          -DLLVM_PATH=../../llvm \
-          ../../llvm/libcxxabi
+          -DLIBCXXABI_TARGET_TRIPLE=${TARGET_TRIPLE} \
+          -DLLVM_PATH=${LLVM_PATH} \
+          ${LLVM_PATH}/libcxxabi
         ${MAKE} VERBOSE=1
         ${MAKE} install
 )
@@ -192,24 +197,28 @@ rumpkernel_install_libcxx()
         LIBCXX_FLAGS="-I${OUTDIR}/include -D_GNU_SOURCE -DPATH_MAX=4096"
         cmake \
           -DCMAKE_CROSSCOMPILING=True \
-          -DCMAKE_C_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang \
+          -DCMAKE_C_COMPILER=${C_COMPILER} \
           -DCMAKE_C_FLAGS="${LIBCXX_FLAGS}" \
-          -DCMAKE_CXX_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang++ \
+          -DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
           -DCMAKE_CXX_FLAGS="${LIBCXX_FLAGS}" \
           -DCMAKE_INSTALL_PREFIX="${OUTDIR}" \
           -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
           -DCMAKE_SHARED_LINKER_FLAGS="${OUTDIR}/lib" \
           -DLIBCXX_CXX_ABI=libcxxabi \
           -DLIBCXX_CXX_ABI_LIBRARY_PATH="${OUTDIR}/lib" \
-          -DLIBCXX_CXX_ABI_INCLUDE_PATHS=../../llvm/libcxxabi/include \
+          -DLIBCXX_CXX_ABI_INCLUDE_PATHS=${LLVM_PATH}/libcxxabi/include \
           -DLIBCXX_ENABLE_SHARED=0 \
           -DLIBCXX_ENABLE_STATIC=1 \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
           -DLIBCXX_HAS_GCC_S_LIB=0 \
-          -DLIBCXX_TARGET_TRIPLE=x86_64-rumprun-linux \
-          -DLLVM_PATH=../../llvm \
-          ../../llvm/libcxx
+          -DLIBCXX_TARGET_TRIPLE=${TARGET_TRIPLE} \
+          -DLLVM_PATH=${LLVM_PATH} \
+          ${LLVM_PATH}/libcxx
         ${MAKE} VERBOSE=1
         ${MAKE} install
+)
+# append cxxflags for libc++
+(
+	sed -i "3s/$/ -stdlib=libc++ -lc++ -lc++abi/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
 )
 }
