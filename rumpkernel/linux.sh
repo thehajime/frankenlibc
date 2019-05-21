@@ -190,7 +190,7 @@ rumpkernel_install_libcxx()
 (
 	if [ -z "${BUILD_QUIET}" ] ; then set -x ; fi
         set -e
-        cp -f rump/include/generated/uapi/linux/version.h rump/include/linux/version.h
+        cp -f ${RUMP}/include/generated/uapi/linux/version.h ${OUTDIR}/include/linux/
         echo "=== building libc++ ==="
         mkdir -p ${RUMPOBJ}/libcxx
         cd ${RUMPOBJ}/libcxx
