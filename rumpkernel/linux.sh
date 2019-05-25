@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ -z ${BUILD_QUIET} ] ; then
+    VERBOSE=1
+else
+    VERBOSE=0
+fi
+
 rumpkernel_buildrump()
 {
 
@@ -154,7 +160,7 @@ rumpkernel_install_libcxx()
           -DLIBUNWIND_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_PATH}/libunwind
-        ${MAKE} VERBOSE=1
+        ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
 # build libc++abi for Linux
@@ -183,7 +189,7 @@ rumpkernel_install_libcxx()
           -DLIBCXXABI_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_PATH}/libcxxabi
-        ${MAKE} VERBOSE=1
+        ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
 # build libc++ for Linux
@@ -214,7 +220,7 @@ rumpkernel_install_libcxx()
           -DLIBCXX_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_PATH}/libcxx
-        ${MAKE} VERBOSE=1
+        ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
 # append cxxflags for libc++
