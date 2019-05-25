@@ -663,6 +663,7 @@ write_log "-n" "building tests.."
 
 # Always make tests to exercise compiler
 CC="${BINDIR}/${COMPILER}" \
+	CXX="${BINDIR}/${COMPILER}++" \
 	RUMPDIR="${OUTDIR}" \
 	RUMPOBJ="${RUMPOBJ}" \
 	BINDIR="${BINDIR}" \
@@ -682,6 +683,7 @@ write_log "-n" "running tests.."
 if [ ${RUNTESTS} = "test" ]
 then
 	CC="${BINDIR}/${COMPILER}" \
+		CXX="${BINDIR}/${COMPILER}++" \
 		RUMPDIR="${OUTDIR}" \
 		RUMPOBJ="${RUMPOBJ}" \
 		BINDIR="${BINDIR}" \
