@@ -167,6 +167,7 @@ rumpkernel_install_libcxx()
           -DLIBUNWIND_ENABLE_SHARED=0 \
           -DLIBUNWIND_ENABLE_STATIC=1 \
           -DLIBUNWIND_ENABLE_CROSS_UNWINDING=1 \
+          -DLLVM_COMPILER_CHECKED=1 \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libunwind
         ${MAKE} VERBOSE=${VERBOSE}
@@ -195,6 +196,7 @@ rumpkernel_install_libcxx()
           -DLIBCXXABI_ENABLE_SHARED=0 \
           -DLIBCXXABI_ENABLE_STATIC=1 \
           -DLIBCXXABI_BAREMETAL=1 \
+          -DLLVM_COMPILER_CHECKED=1 \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libcxxabi
         ${MAKE} VERBOSE=${VERBOSE}
@@ -225,6 +227,7 @@ rumpkernel_install_libcxx()
           -DLIBCXX_ENABLE_STATIC=1 \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
           -DLIBCXX_HAS_GCC_S_LIB=0 \
+          -DLLVM_COMPILER_CHECKED=1 \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libcxx
         ${MAKE} VERBOSE=${VERBOSE}
