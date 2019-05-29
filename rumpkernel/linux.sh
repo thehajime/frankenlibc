@@ -79,6 +79,11 @@ rumpkernel_install_header()
 if [ "${OS}" = "linux" ] ; then
     export EXTRA_LDSCRIPT_CC="-Wl,-defsym,__dso_handle=0 -Wl,-defsym,__cxa_thread_atexit_impl=0"
 fi
+if [ "${OS}" = "darwin" ] ; then
+    export EXTRA_LDSCRIPT_CC="-Wl,-alias,_rumpns__stext,___eh_frame_start \
+     -Wl,-alias,_rumpns__stext,___eh_frame_end -Wl,-alias,_rumpns__stext,___eh_frame_hdr_start \
+     -Wl,-alias,_rumpns__stext,___eh_frame_hdr_end"
+fi
 
 rumpkernel_install_extra_libs ()
 {
@@ -136,7 +141,6 @@ rumpkernel_build_test()
 
 C_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang
 CXX_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang++
-TARGET_TRIPLE=x86_64-rumprun-linux
 LLVM_ROOT_PATH=${PWD}/llvm
 LLVM_PATH=${LLVM_ROOT_PATH}/llvm
 
@@ -163,7 +167,6 @@ rumpkernel_install_libcxx()
           -DLIBUNWIND_ENABLE_SHARED=0 \
           -DLIBUNWIND_ENABLE_STATIC=1 \
           -DLIBUNWIND_ENABLE_CROSS_UNWINDING=1 \
-          -DLIBUNWIND_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libunwind
         ${MAKE} VERBOSE=${VERBOSE}
@@ -192,7 +195,6 @@ rumpkernel_install_libcxx()
           -DLIBCXXABI_ENABLE_SHARED=0 \
           -DLIBCXXABI_ENABLE_STATIC=1 \
           -DLIBCXXABI_BAREMETAL=1 \
-          -DLIBCXXABI_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libcxxabi
         ${MAKE} VERBOSE=${VERBOSE}
@@ -223,7 +225,6 @@ rumpkernel_install_libcxx()
           -DLIBCXX_ENABLE_STATIC=1 \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
           -DLIBCXX_HAS_GCC_S_LIB=0 \
-          -DLIBCXX_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libcxx
         ${MAKE} VERBOSE=${VERBOSE}
@@ -231,6 +232,10 @@ rumpkernel_install_libcxx()
 )
 # append cxxflags for libc++
 (
+if [ "${OS}" = "linux" ] ; then
 	sed -i "3s/$/ -stdlib=libc++ -lc++ -lc++abi/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+elif [ "${OS}" = "darwin" ] ; then
+	sed -i "3s/$/ -stdlib=libc++ -lc++ -lc++abi -lunwind/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+fi
 )
 }
