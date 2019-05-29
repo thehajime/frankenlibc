@@ -17,6 +17,9 @@ checkcheckout ()
 makebuild ()
 {
 	echo "=== Linux build LKLSRC=${LKL_SRCDIR} ==="
+	if [ -z "$(awk -W version | grep "GNU Awk")" ]; then
+		die "GNU Awk is required to build LKL."
+	fi
 	cd ${LKL_SRCDIR}
 	LKL_VERBOSE="V=0"
 	if [ ${NOISE} -gt 1 ] ; then
