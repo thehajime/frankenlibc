@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ -z ${BUILD_QUIET} ] ; then
+    VERBOSE=1
+else
+    VERBOSE=0
+fi
+
 rumpkernel_buildrump()
 {
 
@@ -154,7 +160,7 @@ rumpkernel_install_libcxx()
           -DLIBUNWIND_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_PATH}/libunwind
-        ${MAKE} VERBOSE=1
+        ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
 # build libc++abi for Linux
@@ -183,14 +189,14 @@ rumpkernel_install_libcxx()
           -DLIBCXXABI_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_PATH}/libcxxabi
-        ${MAKE} VERBOSE=1
+        ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
 # build libc++ for Linux
 (
 	if [ -z "${BUILD_QUIET}" ] ; then set -x ; fi
         set -e
-        cp -f rump/include/generated/uapi/linux/version.h rump/include/linux/version.h
+        cp -f ${RUMP}/include/generated/uapi/linux/version.h ${OUTDIR}/include/linux/
         echo "=== building libc++ ==="
         mkdir -p ${RUMPOBJ}/libcxx
         cd ${RUMPOBJ}/libcxx
@@ -214,7 +220,7 @@ rumpkernel_install_libcxx()
           -DLIBCXX_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_PATH}/libcxx
-        ${MAKE} VERBOSE=1
+        ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
 # append cxxflags for libc++
