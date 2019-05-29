@@ -132,7 +132,8 @@ rumpkernel_build_test()
 C_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang
 CXX_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang++
 TARGET_TRIPLE=x86_64-rumprun-linux
-LLVM_PATH=${PWD}/llvm
+LLVM_ROOT_PATH=${PWD}/llvm
+LLVM_PATH=${LLVM_ROOT_PATH}/llvm
 
 rumpkernel_install_libcxx()
 {
@@ -159,7 +160,7 @@ rumpkernel_install_libcxx()
           -DLIBUNWIND_ENABLE_CROSS_UNWINDING=1 \
           -DLIBUNWIND_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
-          ${LLVM_PATH}/libunwind
+          ${LLVM_ROOT_PATH}/libunwind
         ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
@@ -181,14 +182,14 @@ rumpkernel_install_libcxx()
           -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
           -DCMAKE_SHARED_LINKER_FLAGS="-L${OUTDIR}/lib" \
           -DLIBCXXABI_USE_LLVM_UNWINDER=1 \
-          -DLIBCXXABI_LIBUNWIND_PATH=${LLVM_PATH}/unwind \
-          -DLIBCXXABI_LIBCXX_INCLUDES=${LLVM_PATH}/libcxx/include \
+          -DLIBCXXABI_LIBUNWIND_PATH=${LLVM_ROOT_PATH}/unwind \
+          -DLIBCXXABI_LIBCXX_INCLUDES=${LLVM_ROOT_PATH}/libcxx/include \
           -DLIBCXXABI_ENABLE_SHARED=0 \
           -DLIBCXXABI_ENABLE_STATIC=1 \
           -DLIBCXXABI_BAREMETAL=1 \
           -DLIBCXXABI_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
-          ${LLVM_PATH}/libcxxabi
+          ${LLVM_ROOT_PATH}/libcxxabi
         ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
@@ -212,14 +213,14 @@ rumpkernel_install_libcxx()
           -DCMAKE_SHARED_LINKER_FLAGS="${OUTDIR}/lib" \
           -DLIBCXX_CXX_ABI=libcxxabi \
           -DLIBCXX_CXX_ABI_LIBRARY_PATH="${OUTDIR}/lib" \
-          -DLIBCXX_CXX_ABI_INCLUDE_PATHS=${LLVM_PATH}/libcxxabi/include \
+          -DLIBCXX_CXX_ABI_INCLUDE_PATHS=${LLVM_ROOT_PATH}/libcxxabi/include \
           -DLIBCXX_ENABLE_SHARED=0 \
           -DLIBCXX_ENABLE_STATIC=1 \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
           -DLIBCXX_HAS_GCC_S_LIB=0 \
           -DLIBCXX_TARGET_TRIPLE=${TARGET_TRIPLE} \
           -DLLVM_PATH=${LLVM_PATH} \
-          ${LLVM_PATH}/libcxx
+          ${LLVM_ROOT_PATH}/libcxx
         ${MAKE} VERBOSE=${VERBOSE}
         ${MAKE} install
 )
