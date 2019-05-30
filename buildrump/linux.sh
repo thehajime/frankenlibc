@@ -36,7 +36,7 @@ makebuild ()
 	fi
 
 	# clang does not have triple prefix
-	if [ -n "$(${CC} -v 2>&1 > /dev/null | grep "clang")" ]; then
+        if [ -n "$(${CC} -v 2>&1 | grep -q clang)" ]; then
 		LKL_CROSS=
 	fi
 
