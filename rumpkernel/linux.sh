@@ -236,9 +236,9 @@ rumpkernel_install_libcxx()
 # append cxxflags for libc++
 (
 if [ "${OS}" = "linux" ] ; then
-	sed -i "3s/$/ -stdlib=libc++ -lc++ -lc++abi/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+	sed -i "5s/$/ -stdlib=libc++ -lc++ -lc++abi/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
 elif [ "${OS}" = "darwin" ] ; then
-	sed -i "3s/$/ -stdlib=libc++ -lc++ -lc++abi -lunwind/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+	sed -i "5s/$/ -stdlib=libc++ -lc++ -lc++abi -lunwind/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
 fi
 )
 }
