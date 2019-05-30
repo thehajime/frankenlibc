@@ -182,6 +182,7 @@ rumpkernel_install_libcxx()
           -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
           -DCMAKE_SHARED_LINKER_FLAGS="-L${OUTDIR}/lib" \
           -DLIBCXXABI_USE_LLVM_UNWINDER=1 \
+          -DLIBCXXABI_ENABLE_STATIC_UNWINDER=1 \
           -DLIBCXXABI_LIBUNWIND_PATH=${LLVM_ROOT_PATH}/unwind \
           -DLIBCXXABI_LIBCXX_INCLUDES=${LLVM_ROOT_PATH}/libcxx/include \
           -DLIBCXXABI_ENABLE_SHARED=0 \
@@ -214,6 +215,7 @@ rumpkernel_install_libcxx()
           -DLIBCXX_CXX_ABI=libcxxabi \
           -DLIBCXX_CXX_ABI_LIBRARY_PATH="${OUTDIR}/lib" \
           -DLIBCXX_CXX_ABI_INCLUDE_PATHS=${LLVM_ROOT_PATH}/libcxxabi/include \
+          -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=1 \
           -DLIBCXX_ENABLE_SHARED=0 \
           -DLIBCXX_ENABLE_STATIC=1 \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
@@ -226,6 +228,6 @@ rumpkernel_install_libcxx()
 )
 # append cxxflags for libc++
 (
-	sed -i "3s/$/ -stdlib=libc++ -lc++ -lc++abi/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+	sed -i "3s/$/ -stdlib=libc++ -lc++/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
 )
 }
