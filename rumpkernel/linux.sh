@@ -3,7 +3,7 @@
 if [ -z ${BUILD_QUIET} ] ; then
     VERBOSE=1
 else
-    VERBOSE=0
+    VERBOSE=
 fi
 
 rumpkernel_buildrump()
