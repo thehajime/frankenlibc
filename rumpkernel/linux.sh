@@ -211,6 +211,8 @@ rumpkernel_install_libcxx()
         mkdir -p ${RUMPOBJ}/libcxx
         cd ${RUMPOBJ}/libcxx
         LIBCXX_FLAGS="-I${OUTDIR}/include -D_GNU_SOURCE -DPATH_MAX=4096"
+        if [ "${OS}" = "darwin" ] ; then STATIC_ABI_LIBRARY=0 ;
+        else STATIC_ABI_LIBRARY=1; fi
         cmake \
           -DCMAKE_CROSSCOMPILING=True \
           -DCMAKE_C_COMPILER=${C_COMPILER} \
@@ -223,6 +225,7 @@ rumpkernel_install_libcxx()
           -DLIBCXX_CXX_ABI=libcxxabi \
           -DLIBCXX_CXX_ABI_LIBRARY_PATH="${OUTDIR}/lib" \
           -DLIBCXX_CXX_ABI_INCLUDE_PATHS=${LLVM_ROOT_PATH}/libcxxabi/include \
+          -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=${STATIC_ABI_LIBRARY} \
           -DLIBCXX_ENABLE_SHARED=0 \
           -DLIBCXX_ENABLE_STATIC=1 \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
