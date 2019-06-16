@@ -3,7 +3,7 @@
 if [ -z ${BUILD_QUIET} ] ; then
     VERBOSE=1
 else
-    VERBOSE=0
+    VERBOSE=
 fi
 
 rumpkernel_buildrump()
@@ -74,6 +74,16 @@ rumpkernel_install_header()
 
 [ ${OS} = "freebsd" ] && appendvar UNDEF "-U__FreeBSD__"
 [ ${OS} = "darwin" ] && appendvar UNDEF "-U__APPLE__"
+# static c++ binary needs __dso_handle (used by atexit of deconstructor),
+# defined by gnu library
+if [ "${OS}" = "linux" ] ; then
+    export EXTRA_LDSCRIPT_CC="-Wl,-defsym,__dso_handle=0 -Wl,-defsym,__cxa_thread_atexit_impl=0"
+fi
+if [ "${OS}" = "darwin" ] ; then
+    export EXTRA_LDSCRIPT_CC="-Wl,-alias,_rumpns__stext,___eh_frame_start \
+     -Wl,-alias,_rumpns__stext,___eh_frame_end -Wl,-alias,_rumpns__stext,___eh_frame_hdr_start \
+     -Wl,-alias,_rumpns__stext,___eh_frame_hdr_end"
+fi
 
 rumpkernel_install_extra_libs ()
 {
@@ -131,7 +141,6 @@ rumpkernel_build_test()
 
 C_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang
 CXX_COMPILER=${OUTDIR}/bin/x86_64-rumprun-linux-clang++
-TARGET_TRIPLE=x86_64-rumprun-linux
 LLVM_ROOT_PATH=${PWD}/llvm
 LLVM_PATH=${LLVM_ROOT_PATH}/llvm
 
@@ -158,7 +167,7 @@ rumpkernel_install_libcxx()
           -DLIBUNWIND_ENABLE_SHARED=0 \
           -DLIBUNWIND_ENABLE_STATIC=1 \
           -DLIBUNWIND_ENABLE_CROSS_UNWINDING=1 \
-          -DLIBUNWIND_TARGET_TRIPLE=${TARGET_TRIPLE} \
+          -DLLVM_COMPILER_CHECKED=1 \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libunwind
         ${MAKE} VERBOSE=${VERBOSE}
@@ -187,7 +196,7 @@ rumpkernel_install_libcxx()
           -DLIBCXXABI_ENABLE_SHARED=0 \
           -DLIBCXXABI_ENABLE_STATIC=1 \
           -DLIBCXXABI_BAREMETAL=1 \
-          -DLIBCXXABI_TARGET_TRIPLE=${TARGET_TRIPLE} \
+          -DLLVM_COMPILER_CHECKED=1 \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libcxxabi
         ${MAKE} VERBOSE=${VERBOSE}
@@ -202,6 +211,8 @@ rumpkernel_install_libcxx()
         mkdir -p ${RUMPOBJ}/libcxx
         cd ${RUMPOBJ}/libcxx
         LIBCXX_FLAGS="-I${OUTDIR}/include -D_GNU_SOURCE -DPATH_MAX=4096"
+        if [ "${OS}" = "darwin" ] ; then STATIC_ABI_LIBRARY=0 ;
+        else STATIC_ABI_LIBRARY=1; fi
         cmake \
           -DCMAKE_CROSSCOMPILING=True \
           -DCMAKE_C_COMPILER=${C_COMPILER} \
@@ -214,11 +225,12 @@ rumpkernel_install_libcxx()
           -DLIBCXX_CXX_ABI=libcxxabi \
           -DLIBCXX_CXX_ABI_LIBRARY_PATH="${OUTDIR}/lib" \
           -DLIBCXX_CXX_ABI_INCLUDE_PATHS=${LLVM_ROOT_PATH}/libcxxabi/include \
+          -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=${STATIC_ABI_LIBRARY} \
           -DLIBCXX_ENABLE_SHARED=0 \
           -DLIBCXX_ENABLE_STATIC=1 \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
           -DLIBCXX_HAS_GCC_S_LIB=0 \
-          -DLIBCXX_TARGET_TRIPLE=${TARGET_TRIPLE} \
+          -DLLVM_COMPILER_CHECKED=1 \
           -DLLVM_PATH=${LLVM_PATH} \
           ${LLVM_ROOT_PATH}/libcxx
         ${MAKE} VERBOSE=${VERBOSE}
@@ -226,6 +238,10 @@ rumpkernel_install_libcxx()
 )
 # append cxxflags for libc++
 (
-	sed -i "3s/$/ -stdlib=libc++ -lc++ -lc++abi/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+if [ "${OS}" = "linux" ] ; then
+	sed -i "5s/$/ -stdlib=libc++ -lc++ -lc++abi/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+elif [ "${OS}" = "darwin" ] ; then
+	sed -i "5s/$/ -stdlib=libc++ -lc++ -lc++abi -lunwind/" ${OUTDIR}/bin/x86_64-rumprun-linux-clang++
+fi
 )
 }
