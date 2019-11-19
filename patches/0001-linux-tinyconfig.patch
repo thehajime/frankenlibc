@@ -1,0 +1,40 @@
+diff --git a/linux/arch/lkl/configs/tiny.config b/linux/arch/lkl/configs/tiny.config
+new file mode 100644
+index 000000000000..cf58a4eeb1ae
+--- /dev/null
++++ b/linux/arch/lkl/configs/tiny.config
+@@ -0,0 +1,2 @@
++CONFIG_EPOLL=y
++CONFIG_EVENTFD=y
+diff --git a/linux/arch/lkl/kernel/misc.c b/linux/arch/lkl/kernel/misc.c
+index b9abc26879d5..687bdb50a5ee 100644
+--- a/linux/arch/lkl/kernel/misc.c
++++ b/linux/arch/lkl/kernel/misc.c
+@@ -5,6 +5,7 @@
+ #include <asm/ptrace.h>
+ #include <asm/host_ops.h>
+ 
++#ifdef CONFIG_PRINTK
+ void dump_stack(void)
+ {
+ 	unsigned long dummy;
+@@ -22,6 +23,7 @@ void dump_stack(void)
+ 	}
+ 	pr_info("\n");
+ }
++#endif
+ 
+ void show_regs(struct pt_regs *regs)
+ {
+diff --git a/linux/tools/lkl/Makefile b/linux/tools/lkl/Makefile
+index 5e3c362b488c..6254003aba76 100644
+--- a/linux/tools/lkl/Makefile
++++ b/linux/tools/lkl/Makefile
+@@ -75,6 +75,7 @@ $(OUTPUT)lib/lkl.o: bin/stat
+ 	$(Q)$(MAKE) -C ../.. ARCH=lkl $(KOPT) $(KCONFIG)
+ # this workaround is for arm32 linker (ld.gold)
+ 	$(Q)export PATH=$(srctree)/tools/lkl/bin/:${PATH} ;\
++	$(MAKE) -C ../.. ARCH=lkl $(KOPT) ;\
+ 	$(MAKE) -C ../.. ARCH=lkl $(KOPT) install INSTALL_PATH=$(OUTPUT)
+ 
+ # rules to link libs
