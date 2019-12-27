@@ -65,6 +65,7 @@ jobs:
       compiler: arm-linux-gnueabihf-gcc
       env:
         - CC=arm-linux-gnueabihf-gcc
+        - CXX=arm-linux-gnueabihf-g++
         - PATH=/usr/lib/ccache/:$HOME/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/:$PATH
         - ARCH=arm
       before_install:
