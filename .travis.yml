@@ -12,14 +12,14 @@ jobs:
   include:
     - stage: test
       os: linux
-      dist: xenial
+      dist: bionic
       sudo: required
       compiler: clang
       env:
         - ARCH=amd64
     - stage: test
       os: linux
-      dist: xenial
+      dist: bionic
       sudo: required
       compiler: gcc
       env:
@@ -60,17 +60,16 @@ jobs:
         - ln -sf /usr/local/opt/binutils/bin/objcopy ~/.local/bin/objcopy
     - stage: test
       os: linux
-      dist: xenial
+      dist: bionic
       sudo: required
       compiler: arm-linux-gnueabihf-gcc
       env:
         - CC=arm-linux-gnueabihf-gcc
         - CXX=arm-linux-gnueabihf-g++
-        - PATH=/usr/lib/ccache/:$HOME/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/:$PATH
         - ARCH=arm
       before_install:
-        - git clone https://github.com/raspberrypi/tools $HOME/rpi-tools
-        - sudo ln -s `which ccache` /usr/lib/ccache/arm-linux-gnueabihf-gcc
+        - sudo apt-get update
+        - sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross
     - stage: downstream
       before_script:
       script: bash -ex ./.travis-trigger.sh ukontainer/rumprun-packages lkl-musl
