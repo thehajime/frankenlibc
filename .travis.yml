@@ -71,13 +71,27 @@ jobs:
         - git clone https://github.com/raspberrypi/tools $HOME/rpi-tools
         - sudo ln -s `which ccache` /usr/lib/ccache/arm-linux-gnueabihf-gcc
     - stage: downstream
-      allow_failures:
       before_script:
       script: bash -ex ./.travis-trigger.sh ukontainer/rumprun-packages lkl-musl
       os: linux
+    - stage: test
+      os: linux
+      dist: xenial
+      sudo: required
+      compiler: gcc
+      env:
+        - ARCH=amd64
+        - OS=solo5
+        - SOLO5TARGET=spt
+      before_install:
+        - sudo apt-get update
+        - sudo apt-get install -y libseccomp-dev
+  allow_failures:
+    - stage: downstream
 
 before_script:
   - travis_wait 30 git submodule update --init llvm
+  - travis_wait 30 git clone https://github.com/Solo5/solo5.git solo5
   - travis_wait 30 git submodule update --init --depth=50
 script:
   - sudo mkdir -p /opt/rump && sudo chown -R $USER /opt/
