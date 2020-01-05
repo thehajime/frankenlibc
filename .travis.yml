@@ -71,6 +71,7 @@ jobs:
         - git clone https://github.com/raspberrypi/tools $HOME/rpi-tools
         - sudo ln -s `which ccache` /usr/lib/ccache/arm-linux-gnueabihf-gcc
     - stage: downstream
+      allow_failures:
       before_script:
       script: bash -ex ./.travis-trigger.sh ukontainer/rumprun-packages lkl-musl
       os: linux
