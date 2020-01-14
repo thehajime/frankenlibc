@@ -38,10 +38,6 @@ export RUMPOBJ
 EXTRA_AFLAGS="-Wa,--noexecstack"
 EXTRA_CFLAGS="-fPIC"
 
-if [ -n "$(${CC-cc} -v 2>&1 | grep "enable-default-pie")" ]; then
-  EXTRA_LDFLAGS="-no-pie"
-fi
-
 TARGET=$(LC_ALL=C ${CC-cc} -v 2>&1 | sed -n 's/^Target: //p' )
 
 case ${TARGET} in
