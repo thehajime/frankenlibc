@@ -82,7 +82,6 @@ jobs:
       env:
         - ARCH=amd64
         - OS=solo5
-        - SOLO5TARGET=spt
       before_install:
         - sudo apt-get update
         - sudo apt-get install -y libseccomp-dev
@@ -97,6 +96,6 @@ script:
   - sudo mkdir -p /opt/rump && sudo chown -R $USER /opt/
   - for file in `find patches/ -maxdepth 1 -type f` ; do patch -p1 < $file ; done
   - for file in `find patches/$TRAVIS_OS_NAME/ -maxdepth 1 -type f` ; do patch -p1 < $file ; done
-  - if [ $OS = "solo5" ] ; then ./build.sh -d /opt/rump -q -k linux $OS $SOLO5TARGET notest ; else ./build.sh -d /opt/rump -q -k linux notest ; fi
-  - if [ $CC != "arm-linux-gnueabihf-gcc" ] && [ $OS != "solo5"] ; then RUMPDIR=/opt/rump RUMPOBJ=`pwd`/rumpobj make -C tests run ; fi
+  - ./build.sh -d /opt/rump -q -k linux notest $OS
+  - if [ $CC != "arm-linux-gnueabihf-gcc" ] ; then RUMPDIR=/opt/rump RUMPOBJ=`pwd`/rumpobj make -C tests run ; fi
   - if [ $TRAVIS_REPO_SLUG == "ukontainer/frankenlibc" ] ; then bash -ex ./.travis-deploy.sh $DEPLOY ; fi
